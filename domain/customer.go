@@ -1,6 +1,9 @@
 package domain
 
-import "github.com/PyMarcus/go_banking_api/errs"
+import (
+	"github.com/PyMarcus/go_banking_api/dto"
+	"github.com/PyMarcus/go_banking_api/errs"
+)
 
 type Customer struct {
 	Id           string `db:"customer_id"`
@@ -9,6 +12,26 @@ type Customer struct {
 	ZipCode      string `db:"zipcode"`
 	BirthdayDate string `db:"date_of_birth"`
 	Status       string `db:"status"`
+}
+
+func (customer Customer) ToDTO() *dto.CustomerResponse{
+	customer.statusAsTxt()
+	return &dto.CustomerResponse{
+		Id: customer.Id,
+		Name: customer.Name,
+		ZipCode: customer.ZipCode,
+		BirthdayDate: customer.BirthdayDate,
+		Status: customer.Status,
+		City: customer.City,
+	}
+}
+
+func (customer *Customer) statusAsTxt(){
+	if customer.Status == "false" {
+		customer.Status = "inactive"
+	}else{
+		customer.Status = "active"
+	}
 }
 
 // interface[port]

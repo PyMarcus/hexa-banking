@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/PyMarcus/go_banking_api/domain"
+	"github.com/PyMarcus/go_banking_api/dto"
 	"github.com/PyMarcus/go_banking_api/errs"
 	"github.com/PyMarcus/go_banking_api/service"
 	"github.com/gorilla/mux"
@@ -53,7 +54,7 @@ func (ch *CustomerHandler) getCustomerById(w http.ResponseWriter, r *http.Reques
 }
 
 func (ch *CustomerHandler) getCustomersByStatus(w http.ResponseWriter, status string){
-	var customers []domain.Customer
+	var customers []dto.CustomerResponse
 	var err *errs.AppError
 
 	if(status == "active"){

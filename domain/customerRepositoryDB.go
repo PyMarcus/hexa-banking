@@ -47,7 +47,7 @@ func (crdb CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	db := crdb.db
 	var customer Customer
 
-	selectCustomerById := "SELECT * FROM customers WHERE customer_id = $1;"
+	selectCustomerById := "SELECT customer_id, name, city, zipcode, date_of_birth, status FROM customers WHERE customer_id = $1;"
 
 	err := db.Get(&customer, selectCustomerById, id)
 
