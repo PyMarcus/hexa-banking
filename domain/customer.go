@@ -3,12 +3,12 @@ package domain
 import "github.com/PyMarcus/go_banking_api/errs"
 
 type Customer struct {
-	Id           string
-	Name         string
-	City         string
-	ZipCode      string
-	BirthdayDate string
-	Status       string
+	Id           string `db:"customer_id"`
+	Name         string `db:"name"`
+	City         string `db:"city"`
+	ZipCode      string `db:"zipcode"`
+	BirthdayDate string `db:"date_of_birth"`
+	Status       string `db:"status"`
 }
 
 // interface[port]
