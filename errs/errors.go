@@ -22,3 +22,10 @@ func UnexpectedDatabaseError(message string) *AppError {
 		Code:    http.StatusInternalServerError,
 	}
 }
+
+func NewValidationError(message string) *AppError{
+	return &AppError{
+		Code: http.StatusUnprocessableEntity,
+		Message: message,
+	}
+}

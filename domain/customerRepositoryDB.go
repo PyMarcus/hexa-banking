@@ -1,10 +1,8 @@
 package domain
 
 import (
-	"fmt"
 	"database/sql"
 
-	"github.com/PyMarcus/go_banking_api/config"
 	"github.com/PyMarcus/go_banking_api/errs"
 	"github.com/PyMarcus/go_banking_api/logger"
 	"github.com/jmoiron/sqlx"
@@ -16,20 +14,7 @@ type CustomerRepositoryDb struct {
 	db *sqlx.DB
 }
 
-func NewCustomerRepositoryDb() CustomerRepositoryDb {
-	user := config.GlobalConfig.DBUser
-	password := config.GlobalConfig.DBPassword
-	host := config.GlobalConfig.DBHost
-	database := config.GlobalConfig.DBDatabase
-	
-	connStr := fmt.Sprintf("postgresql://%s:%s@%s/%s?sslmode=disable", user, password, host, database)
-	db, err := sqlx.Open("postgres", connStr)
-	if err != nil {
-		logger.Error("Fail to connect into database err: " + err.Error())
-		db.Close()
-		panic(err)
-	}
-
+func NewCustomerRepositoryDb(db *sqlx.DB) CustomerRepositoryDb {
 	return CustomerRepositoryDb{db: db}
 }
 

@@ -7,10 +7,10 @@ import (
 )
 
 type ICustomerService interface {
-	GetAllCustomers([]domain.Customer, *errs.AppError)
+	GetAllCustomers([]dto.CustomerResponse, *errs.AppError)
 	GetCustomer(string)(*dto.CustomerResponse, *errs.AppError)
-	GetActiveCustomers() ([]domain.Customer, *errs.AppError)
-	GetInactiveCustomers() ([]domain.Customer, *errs.AppError)
+	GetActiveCustomers() ([]dto.CustomerResponse, *errs.AppError)
+	GetInactiveCustomers() ([]dto.CustomerResponse, *errs.AppError)
 }
 
 type DefaultCustomerService struct {

@@ -2,13 +2,17 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/PyMarcus/go_banking_api/config"
 	"github.com/PyMarcus/go_banking_api/domain"
 	"github.com/PyMarcus/go_banking_api/dto"
 	"github.com/PyMarcus/go_banking_api/errs"
+	"github.com/PyMarcus/go_banking_api/logger"
 	"github.com/PyMarcus/go_banking_api/service"
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 type CustomerHandler struct {
@@ -18,15 +22,26 @@ type CustomerHandler struct {
 // postgres, postgres, your_password
 func router() *mux.Router {
 	mux := mux.NewRouter()
-	getMethodsHandlers(mux)
+	methodsHandlers(mux)
 	return mux
 }
 
-func getMethodsHandlers(mux *mux.Router) {
+func methodsHandlers(mux *mux.Router) {
 	// customerHandler := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
-	customerHandler := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryDb())}
+	dbClient := getDBClient()
+	customerRepo := domain.NewCustomerRepositoryDb(dbClient)
+	accountRepo := domain.NewAccountRepository(dbClient)
+	// handler
+	customerHandler := CustomerHandler{service.NewCustomerService(customerRepo)}
+	accountHandler :=  AccountHandler{service.NewAccountService(accountRepo)}
+
+	// multiplex customers
 	mux.HandleFunc("/api/v1/customers", customerHandler.getCustomers).Methods(http.MethodGet)
 	mux.HandleFunc("/api/v1/customers/{customer_id:[0-9]+}", customerHandler.getCustomerById).Methods(http.MethodGet)
+
+	// multiplex account
+	mux.HandleFunc("/api/v1/customers/{customer_id:[0-9]+}/account", accountHandler.NewAccount).Methods(http.MethodPost)
+
 }
 
 func (ch *CustomerHandler) getCustomers(w http.ResponseWriter, r *http.Request) {
@@ -75,4 +90,20 @@ func writeResponse(w http.ResponseWriter, code int, data any){
 	if err := json.NewEncoder(w).Encode(data); err != nil{
 		panic(err.Error())
 	}
+}
+
+func getDBClient() *sqlx.DB{
+	user := config.GlobalConfig.DBUser
+	password := config.GlobalConfig.DBPassword
+	host := config.GlobalConfig.DBHost
+	database := config.GlobalConfig.DBDatabase
+
+	connStr := fmt.Sprintf("postgresql://%s:%s@%s/%s?sslmode=disable", user, password, host, database)
+	db, err := sqlx.Open("postgres", connStr)
+	if err != nil {
+		logger.Error("Fail to connect into database err: " + err.Error())
+		db.Close()
+		panic(err)
+	}
+	return db
 }
