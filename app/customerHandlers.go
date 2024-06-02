@@ -31,9 +31,11 @@ func methodsHandlers(mux *mux.Router) {
 	dbClient := getDBClient()
 	customerRepo := domain.NewCustomerRepositoryDb(dbClient)
 	accountRepo := domain.NewAccountRepository(dbClient)
+	transactionRepo := domain.NewTransactionRepository(dbClient)
 	// handler
 	customerHandler := CustomerHandler{service.NewCustomerService(customerRepo)}
 	accountHandler :=  AccountHandler{service.NewAccountService(accountRepo)}
+	transactionHandler :=  TransactionHandler{service.NewTransactionService(transactionRepo)}
 
 	// multiplex customers
 	mux.HandleFunc("/api/v1/customers", customerHandler.getCustomers).Methods(http.MethodGet)
@@ -41,6 +43,9 @@ func methodsHandlers(mux *mux.Router) {
 
 	// multiplex account
 	mux.HandleFunc("/api/v1/customers/{customer_id:[0-9]+}/account", accountHandler.NewAccount).Methods(http.MethodPost)
+
+	// multiplex transaction
+	mux.HandleFunc("/api/v1/customers/{customer_id:[0-9]+}/account/{destiny_id:[0-9]+}", transactionHandler.NewTransaction).Methods(http.MethodPost)
 
 }
 
